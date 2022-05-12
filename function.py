@@ -26,14 +26,16 @@ def checkStock(typePizza, stock):
 
 
 def choixTypePizzaEtReductionStock(stock, possiblePizzaDict):
-    typePizza = input("Veuillez choisir un type de pizza : ")
+    typePizza = int(input("Veuillez choisir un type de pizza : "))
     if 0 < int(typePizza) < 3:
         if checkStock(typePizza, stock):
             if typePizza == 1:
-                stock.ingredientTab["Jambon"] -= possiblePizzaDict[0]["nbJambon"]
-                stock.ingredientTab["Jambon"] -= possiblePizzaDict[0]["nbAnanas"]
+                stock.ingredientTab["Jambon"] -= possiblePizzaDict[1]["nbJambon"]
+                stock.ingredientTab["Ananas"] -= possiblePizzaDict[1]["nbAnanas"]
+                stock.ingredientTab["Base Tomate"] -= 1
             if typePizza == 2:
-                stock.ingredientTab["Lamelle de roquette"] -= possiblePizzaDict[1]["nbRoquette"]
+                stock.ingredientTab["Lamelle de roquette"] -= possiblePizzaDict[2]["nbRoquette"]
+                stock.ingredientTab["Base Tomate"] -= 1
         else:
-            print("MAIS CONCENTRE TOI")
+            print("Pas assez d'ingrédient pour cette pizza")
 
