@@ -1,7 +1,7 @@
 import os
 
 
-def affichageBase(possiblePizza:  dict, stock):
+def affichageBase(possiblePizza: dict, stock):
     os.system('clear')
 
     for key, value in stock.ingredientTab.items():
@@ -15,7 +15,8 @@ def affichageBase(possiblePizza:  dict, stock):
 
 def checkStock(typePizza, stock):
     if typePizza == 1:
-        if stock.ingredientTab["Jambon"] > 2 and stock.ingredientTab["Ananas"] > 2 and stock.ingredientTab["Base Tomate"] > 0:
+        if stock.ingredientTab["Jambon"] > 2 and stock.ingredientTab["Ananas"] > 2 and stock.ingredientTab[
+            "Base Tomate"] > 0:
             return True
     if typePizza == 2:
         if stock.ingredientTab["Lamelle de roquette"] > 6 and stock.ingredientTab["Base Tomate"] > 0:
@@ -23,4 +24,10 @@ def checkStock(typePizza, stock):
     return False
 
 
-
+def choixTypePizza(stock):
+    typePizza = input("Veuillez choisir un type de pizza : ")
+    if 0 < int(typePizza) < 3:
+        if checkStock(typePizza, stock):
+            pass
+        else:
+            print("MAIS CONCENTRE TOI")
