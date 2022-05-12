@@ -1,4 +1,5 @@
 from stock import Stock
+from function import *
 
 possible_pizza = {1: "hawaïenne", 2: "rucola"}
 
