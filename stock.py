@@ -1,14 +1,14 @@
 from random import randint
 
 
+def randomNumberIngredient():
+    return randint(5, 45)
+
+
 class Stock:
     def __init__(self):
-        self.roquette = self.random()
-        self.jambon = self.random()
-        self.ananas = self.random()
-        self.baseTomate = self.random()
+        self.ingredientTab = {"Jambon": randomNumberIngredient(), "Ananas": randomNumberIngredient(), "Base Tomate": randomNumberIngredient(), "Lamelle de roquette": randomNumberIngredient()}
 
-    def random(self):
-        return randint(5, 45)
+
 
 
