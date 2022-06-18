@@ -1,0 +1,34 @@
+<html>
+<head>
+<style>
+
+    .text_game{
+        color: coral;
+        font-size: 30pt;
+    }
+    .test{
+    }
+</style>
+
+</head>
+<body>
+<p>Nom de la pizza : </p>
+<input type="text" id="name" name="name" required minlength="4" maxlength="8" size="10">
+<p>Indications sur la recette à suivre avec des précisions éventuelles (ingrédients après la cuisson) : </p>
+<input type="text" id="name" name="name" required minlength="4" maxlength="8" size="10">
+<div class = "test">Ingrédient 1 :
+<input type="text" id="name" name="name" required minlength="4" maxlength="8" size="10">
+<input type="checkbox" id="post-cuisson" name="post-cuisson" checked>
+<label for="post-cuisson">post-cuisson</label>
+</div>
+<button id='add'>Ajouter un ingrédient</button>
+<script>
+    document.getElementById('add').onclick = function () { myFunction() };
+
+        function myFunction() {
+            document.createElement('div');
+        }
+</script>
+
+</body>
+</html>

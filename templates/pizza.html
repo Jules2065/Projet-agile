@@ -1,0 +1,45 @@
+<html>
+<head>
+<script>
+    function startTime(num){
+        num--;
+        document.getElementById('txt').innerHTML = num + " secondes restantes";
+        if (num != 0){
+            setTimeout(startTime, 1000, num);
+        }
+        else {
+            
+        }
+    }
+
+    function checkTime(i) {
+        if (i < 10) { i = "0" + i };
+        return i;
+    }
+</script>
+<style>
+
+    .text_game{
+        color: coral;
+        font-size: 30pt;
+    }
+</style>
+
+</head>
+<body>
+<div id="txt"></div>
+<script>
+    console.log("Début appel")
+    startTime({{timer}});
+</script>
+
+<h1 class="text_game">{{text | safe}}</h1>
+<button>Bouton 1</button>
+<button>Bouton 2</button>
+<button>Bouton 3</button>
+<button>Bouton 4</button>
+
+
+
+</body>
+</html>

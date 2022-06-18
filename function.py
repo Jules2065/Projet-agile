@@ -5,16 +5,19 @@ from turtle import screensize
 
 
 def affichageBase(possiblePizza: dict, stock, pizzaPrete, score):
+    ret = ''
     for key, value in stock.ingredientTab.items():
         if value == 0:
             continue
-        print("Il reste " + str(value) + " " + key)
+        ret += 'Il reste ' + str(value) + ' ' + key + '<br>'
 
     for key, value in possiblePizza.items():
-        print(str(key) + " - " + value["kind"] + " (" + value["recette"] + ")")
-    print("10 - mettre les pizzas au four")
-    print("Pizza prête à la cuisson : " + str(pizzaPrete))
-    print("Score actuel :", score )
+        ret += str(key) + ' - ' + value["kind"] + \
+            ' (' + value["recette"] +'<br>'
+    ret += '10 - mettre les pizzas au four<br>'
+    ret += 'Pizza prête à la cuisson : ' + str(pizzaPrete) +'<br>'
+    ret += 'Score actuel :' + str(score)
+    return ret
 
 def checkStock(typePizza, stock):
     typePizza = int(typePizza)
