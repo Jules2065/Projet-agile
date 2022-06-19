@@ -1,10 +1,19 @@
+import argparse
 from glob import glob
 import os
 import time
-from turtle import screensize
+from turtle import screensize, st
 
 
-def affichageBase(possiblePizza: dict, stock, pizzaPrete, score):
+def check_if_equal(list_1, list_2):
+    if len(list_1) != len(list_2):
+        return False
+    print(sorted(list_1))
+    print(sorted(list_2))
+    return sorted(list_1) == sorted(list_2)
+
+
+def affichageBase(possiblePizza: dict, stock, pizzaPrete, score, annexe: str = ""):
     ret = ''
     for key, value in stock.ingredientTab.items():
         if value == 0:
@@ -14,59 +23,52 @@ def affichageBase(possiblePizza: dict, stock, pizzaPrete, score):
     for key, value in possiblePizza.items():
         ret += str(key) + ' - ' + value["kind"] + \
             ' (' + value["recette"] +'<br>'
-    ret += '10 - mettre les pizzas au four<br>'
     ret += 'Pizza prête à la cuisson : ' + str(pizzaPrete) +'<br>'
-    ret += 'Score actuel :' + str(score)
+    ret += 'Score actuel :' + str(score) +'<br>'
+    ret += annexe
     return ret
 
+
+
+def recetteValide(tab, stock):
+    arr = []
+    contient = []
+    for i in range(len(tab["pizza_ingredients"])):
+        if tab["pizza_ingredients"][i][0] not in contient:
+            tab["pizza_ingredients"][i][1] = int(tab["pizza_ingredients"][i][1])
+            arr.append(tuple(tab["pizza_ingredients"][i]))
+            contient.append(tab["pizza_ingredients"][i][0])
+        else:
+            for j in range(len(arr)):
+                if arr[j][0] == tab["pizza_ingredients"][i][0]:
+                    tempo = list(arr[j])
+                    tempo[1] = arr[j][1] + int(tab["pizza_ingredients"][i][1])
+                    arr = tuple(tempo)
+    
+    
+    for k in range (len(stock.possiblePizzaDict)):
+        if check_if_equal(arr, stock.possiblePizzaDict[k+1]["Ingrédients"]):
+            return (k+1)
+    return False
 def checkStock(typePizza, stock):
     typePizza = int(typePizza)
-    if typePizza == 1:
-        if stock.ingredientTab["Jambon"] > 2 and stock.ingredientTab["Ananas"] > 2 and stock.ingredientTab[
-                "Base Tomate"] > 0:
-            return True
-    if typePizza == 2:
-        if stock.ingredientTab["Lamelle de roquette"] > 6 and stock.ingredientTab["Base Tomate"] > 0:
-            return True
-    return False
+
+    for sto in stock.possiblePizzaDict[typePizza]["Ingrédients"]:
+        if stock.ingredientTab[sto[0]] < int(sto[1]):
+            return 2
+    stock.ingredientTab["Base Tomate"] -= 1
+    for sto in stock.possiblePizzaDict[typePizza]["Ingrédients"]:
+        stock.ingredientTab[sto[0]] -= int(sto[1])
+    
+    return 0
 
 
-def choixTypePizzaEtReductionStock(stock, possiblePizzaDict, pizzaPrete, score):
-    nbrRucola = 0
-    ret = True
-    typePizza = int(input("Veuillez choisir un type de pizza : "))
-    cls()
-    if 0 < int(typePizza) < 3:
-        if checkStock(typePizza, stock):
-            if pizzaPrete < 3:
-                if typePizza == 1:
-                    stock.ingredientTab["Jambon"] -= possiblePizzaDict[1]["nbJambon"]
-                    stock.ingredientTab["Ananas"] -= possiblePizzaDict[1]["nbAnanas"]
-                    stock.ingredientTab["Base Tomate"] -= 1
-                if typePizza == 2:
-                    nbrRucola += 1
-                    stock.ingredientTab["Base Tomate"] -= 1
-                pizzaPrete += 1
-            else:
-                print("Pas plus de trois pizza à la fois, veuillez les mettre au four")
-        else:
-            print("Pas assez d'ingrédient pour cette pizza")
-            ret = False
-    elif int(typePizza) == 10:
-        if pizzaPrete > 0:
-            print("Cuisson lancée pendant 30 secondes")
-            for i in range(30):
-                print("Temps de cuisson écoulé : " + str(i) + " secondes")
-                time.sleep(1)
-                cls()
-            for i in range (nbrRucola):
-                stock.ingredientTab["Lamelle de roquette"] -= possiblePizzaDict[1]["nbRoquette"]
-            score += pizzaPrete * 10
-            pizzaPrete = 0
-        else:
-            print("Pas de pizza à cuire")
 
-    return ret, pizzaPrete, score
+
+
+
+
+
 
 def EndOfGame(score, stock):
     print("Jeu fini")
@@ -79,6 +81,4 @@ def EndOfGame(score, stock):
             score -= value * 4
         else:
             score -= value
-    print("Score final : " + str(score))
-def cls():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    return score

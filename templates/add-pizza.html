@@ -5,29 +5,113 @@
     .text_game{
         color: coral;
         font-size: 30pt;
+    
     }
-    .test{
-    }
+    .child {
+    display: inline-block;
+}
 </style>
-
+<script>var nbrIngrédient = 1;</script>
 </head>
 <body>
-<p>Nom de la pizza : </p>
-<input type="text" id="name" name="name" required minlength="4" maxlength="8" size="10">
-<p>Indications sur la recette à suivre avec des précisions éventuelles (ingrédients après la cuisson) : </p>
-<input type="text" id="name" name="name" required minlength="4" maxlength="8" size="10">
-<div class = "test">Ingrédient 1 :
-<input type="text" id="name" name="name" required minlength="4" maxlength="8" size="10">
-<input type="checkbox" id="post-cuisson" name="post-cuisson" checked>
-<label for="post-cuisson">post-cuisson</label>
+
+<div>
+    <p class="child">Nom de la pizza : </p>
+    <input class="child" type="text" id="name" name="name" required minlength="4" maxlength="8" size="10">
+</div>
+<div>
+    <p class="child">Indications sur la recette à suivre avec des précisions éventuelles (ingrédients après la cuisson) : </p>
+    <input class="child" type="text" id="receipt" name="receipt" required minlength="1" maxlength="20" size="20">
+</div>
+
+<div>Ingrédient 1 :
+    <input type="text" id="text1" name="text1" required minlength="1" maxlength="20" size="20">
+    <input type="number" id="number1" name="number1">
+    <input type="checkbox" id="post-cuisson1" name="post-cuisson1">
+    <label>post-cuisson</label>
 </div>
 <button id='add'>Ajouter un ingrédient</button>
+<button id='valid'>Valider la pizza</button>
+<p id="error" style="color: red; display: none;">Veuillez remplir correctement toutes les cases!</p>
 <script>
-    document.getElementById('add').onclick = function () { myFunction() };
+    document.getElementById('add').onclick = function () { addFunction() };
+    
+    function addFunction() {
+        nbrIngrédient++;
+        var newDiv = document.createElement('div');
+        newDiv.className = "test";
+        newDiv.textContent = "Ingrédient " + nbrIngrédient + " : "
+        var newInputText = document.createElement('input');
+        newInputText.type = "text";
+        newInputText.id = "text" + nbrIngrédient;
+        newInputText.name = "text" + nbrIngrédient;
+        newInputText.required = true;
+        newInputText.minLength = "1";
+        newInputText.maxLength = "20";
+        newInputText.size = "20";
+        newDiv.appendChild(newInputText);
+        var newInputNumber = document.createElement('input');
+        newInputNumber.type = "number";
+        newInputNumber.id = "number" + nbrIngrédient;
+        newInputNumber.name = "number" + nbrIngrédient;
+        newDiv.appendChild(newInputNumber);
+        var newInputBox = document.createElement('input');
+        newInputBox.type = "checkbox";
+        newInputBox.id = "post-cuisson" + nbrIngrédient;
+        newInputBox.name = "post-cuisson" + nbrIngrédient;
+        newDiv.appendChild(newInputBox);
+        var newLabel = document.createElement('label');
+        newLabel.textContent = "post-cuisson";
+        newDiv.appendChild(newLabel);
+        var button = document.getElementById('add');
 
-        function myFunction() {
-            document.createElement('div');
+        document.body.insertBefore(newDiv, button);
+    }
+    document.getElementById('valid').onclick = function () { validFunction() };
+    
+    function validFunction() {
+        if (checkFunction()){
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost:5000/menu/get-new-pizza");
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            pizza_ingredients = new Array(nbrIngrédient);
+            for (let i = 0; i < nbrIngrédient; i++){
+                pizza_ingredients[i] = new Array(3);
+                pizza_ingredients[i][0] = document.getElementById("text" + String(i+1)).value;
+                pizza_ingredients[i][1] = document.getElementById("number" + String(i+1)).value;
+                pizza_ingredients[i][2] = document.getElementById("post-cuisson" + String(i+1)).checked;
+            }
+            xhr.send(JSON.stringify({
+                pizza_name: document.getElementById("name").value,
+                pizza_receipt: document.getElementById("receipt").value,
+                pizza_ingredients: pizza_ingredients
+            }));
+            window.location.href = "http://localhost:5000/";
         }
+        else {
+            document.getElementById('error').style.display = 'block';
+        }
+    }
+    function checkFunction() {
+        if (document.getElementById("name").value == ""){
+            return false;
+        }
+        if (document.getElementById("receipt").value == ""){
+            return false;
+        }
+        pizza_ingredients = new Array(nbrIngrédient);
+        for (let i = 0; i < nbrIngrédient; i++){
+            console.log("receipt : " + document.getElementById("text" + String(i+1)).value);
+            if (document.getElementById("text" + String(i+1)).value == ""){
+                return false;
+            }
+            console.log("receipt : " + document.getElementById("number" + String(i+1)).value);
+            if (document.getElementById("number" + String(i+1)).value <= 0 || document.getElementById("number" + String(i+1)).value ==""){
+                return false;
+            }
+        }
+        return true;
+    }
 </script>
 
 </body>

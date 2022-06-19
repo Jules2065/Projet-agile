@@ -1,5 +1,6 @@
 <html>
 <head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
     function startTime(num){
         num--;
@@ -8,7 +9,26 @@
             setTimeout(startTime, 1000, num);
         }
         else {
+            window.location.href = "http://localhost:5000/menu/game-over";
+        }
+    }
+    function startTimerFour(num){
+        num--;
+        console.log("PAsse amais");
+        document.getElementById('timer-four').innerHTML = "Temps de cuisson restant : " + num;
+        if (num != 0){
+            setTimeout(startTimerFour, 1000, num);
+        }
+        else {
+            fourEnCours = false;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost:5000/menu/fin-four");
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function () {
+                document.getElementById("main-text").innerHTML = this.responseText;
             
+            };
+            xhr.send('');
         }
     }
 
@@ -20,25 +40,146 @@
 <style>
 
     .text_game{
-        color: coral;
-        font-size: 30pt;
+        font-size: 15pt;
     }
-</style>
+    select {
+    font-size: .9rem;
+    padding: 2px 5px;
+}
 
+</style>
+<script>
+    var nbrIngrédient = 0;
+    var fourEnCours = false;
+</script>
 </head>
 <body>
 <div id="txt"></div>
 <script>
-    console.log("Début appel")
+    console.log("Début appel");
     startTime({{timer}});
 </script>
 
-<h1 class="text_game">{{text | safe}}</h1>
-<button>Bouton 1</button>
-<button>Bouton 2</button>
-<button>Bouton 3</button>
-<button>Bouton 4</button>
+<h1 id ="main-text" class="text_game">{{text | safe}}</h1>
+<h1 id ="timer-four" class="text_game">Temps de cuisson restant : 0</h1>
+<button id='add'>Ajouter une pizza</button>
+<button id='four'>Mettre les pizzas au four</button>
+<div id="end_of_doc"></div>
+<button id='valid' style="display: none;">Valider la nouvelle pizza</button>
+<script>
+    document.getElementById('add').onclick = function () { addFunction() };
+    function addFunction() {
+        document.getElementById('add').textContent = "Ajouter un ingrédient";
+        document.getElementById('valid').style.display = 'block';
+        nbrIngrédient++;
+        var newDiv = document.createElement('div');
+        newDiv.className = "test";
+        newDiv.textContent = "Ingrédient " + nbrIngrédient + " : "
+        newDiv.id="main_div";
+        var newInputText = document.createElement('select');
+        newInputText.id = "text" + nbrIngrédient;
+        newInputText.name = "text" + nbrIngrédient;
+        var newOption= document.createElement('option');
+        newOption.value = "header";
+        newOption.textContent = "Veuillez choisir un ingrédient";
+        newInputText.appendChild(newOption);
+        $.ajax({ 
+            dataType: "json",
+            type: 'GET', 
+            url: 'http://localhost:5000/menu/get-stock', 
+            data: 0, 
+            success: function (data) { 
+                for(var i in data){
+                    if (i != "Base Tomate"){
+                        var newOption= document.createElement('option');
+                        newOption.value = String(i);
+                        newOption.textContent = String(i);
+                        newInputText.appendChild(newOption);
+                    }
+                }
+            }
+        });
+        newDiv.appendChild(newInputText);
 
+        var newInputNumber = document.createElement('input');
+        newInputNumber.type = "number";
+        newInputNumber.id = "number" + nbrIngrédient;
+        newInputNumber.name = "number" + nbrIngrédient;
+        newDiv.appendChild(newInputNumber);
+        var newInputBox = document.createElement('input');
+        newInputBox.type = "checkbox";
+        newInputBox.id = "post-cuisson" + nbrIngrédient;
+        newInputBox.name = "post-cuisson" + nbrIngrédient;
+        newDiv.appendChild(newInputBox);
+        var newLabel = document.createElement('label');
+        newLabel.textContent = "post-cuisson";
+        newDiv.appendChild(newLabel);
+        var end = document.getElementById('end_of_doc');
+
+        document.body.insertBefore(newDiv, end);
+    }
+    console.log("Allo putainb de merde");
+    document.getElementById('valid').onclick = function () { validFunction() };
+    
+    function validFunction() {
+           
+            document.getElementById('add').textContent = "Ajouter une pizza";
+            document.getElementById('valid').style.display = 'none';
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost:5000/menu/check-stock");
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            
+
+            pizza_ingredients = new Array(nbrIngrédient);
+            for (let i = 0; i < nbrIngrédient; i++){
+                pizza_ingredients[i] = new Array(3);
+                pizza_ingredients[i][0] = document.getElementById("text" + String(i+1)).value;
+                pizza_ingredients[i][1] = document.getElementById("number" + String(i+1)).value;
+                pizza_ingredients[i][2] = document.getElementById("post-cuisson" + String(i+1)).checked;
+            }
+            xhr.onload = function () {
+                document.getElementById("main-text").innerHTML = this.responseText;
+            };
+            xhr.send(JSON.stringify({
+                pizza_ingredients: pizza_ingredients
+            }));
+            nbrIngrédient = 0;
+            var elms = document.querySelectorAll("[id='main_div']");
+ 
+            for(var i = 0; i < elms.length; i++) 
+                elms[i].remove(); 
+    }
+    document.getElementById('four').onclick = function () { fourFunction() };
+    
+    function fourFunction() {
+            console.log("allo");
+           
+            document.getElementById('add').textContent = "Ajouter une pizza";
+            document.getElementById('valid').style.display = 'none';
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost:5000/menu/lancer-four");
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function () {
+                if (fourEnCours == false){
+                    console.log("eejejje : " + this.response[0]);
+                    if (this.response[0] == "I" || this.response[0] == "1"){
+                        document.getElementById("main-text").innerHTML = this.responseText;
+                        fourEnCours = true;
+                        startTimerFour(30);
+                    }
+                    else {
+                        document.getElementById("main-text").innerHTML = this.responseText;
+                    }
+                }
+            };
+            xhr.send('');
+            nbrIngrédient = 0;
+            var elms = document.querySelectorAll("[id='main_div']");
+ 
+            for(var i = 0; i < elms.length; i++) 
+                elms[i].remove(); 
+    }
+</script>
 
 
 </body>
