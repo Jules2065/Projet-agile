@@ -1,0 +1,45 @@
+pipeline{
+
+	agent any
+
+	environment {
+		registryCredential='Pizza_Docker'
+	}
+
+	stages {
+	    
+	    
+
+		stage('Build : create Docker Image  ') {
+
+			steps {
+				sh 'cp -r /var/lib/jenkins/workspace/PIZZAProd/* /var/lib/jenkins/workspace/PIZZA_Repo/'
+				sh 'docker build -t imagedocker:latest .'
+				sh 'echo "Success" '
+
+			}
+		}
+
+		stage('Login') {
+
+			steps {
+				sh ' docker login -u hubdockerpizza -p hubdocker123'
+			}
+		}
+
+		stage('Push Docker  Image Into Docker Hub') {
+
+			steps {
+				sh 'docker push imagedocker:latest'
+				sh 'echo "Success" '
+			}
+		}
+	}
+
+	post {
+		always {
+			sh 'docker logout'
+		}
+	}
+
+}
